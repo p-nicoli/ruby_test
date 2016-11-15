@@ -7,6 +7,26 @@ class Event < ActiveRecord::Base
   OPENING_DURATION = 30.minutes
   MAX_LENGTH = 7
 
+  def self.availabilities(from_date=DateTime.parse("1970-01-01"))
+    request_interval = from_date..from_date+6.days
+
+    openings = Event.where(kind: "opening", starts_at: request_interval)
+
+    (request_interval).collect do |day|
+      availability = Hash.new
+      availability[:date] = day
+      availability[:slots] = make_opening_slots(day, openings)
+      availability
+    end
+  end
+
+  def self.make_opening_slots(day, openings)
+    openings.select { |opening| opening.starts_at.to_date == day }.collect do |opening|
+      get_slots(opening.starts_at, opening.ends_at)
+    end.flatten
+  end
+
+
   def self.availabilities_legacy( from_date=DateTime.parse("1970-01-01") )
     availabilities = []
     future_openings = future_openings(from_date)

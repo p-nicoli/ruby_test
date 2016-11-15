@@ -14,6 +14,53 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 1, found_events.size
   end
 
+  # Works when using Enum for openings but makes the database field change to int type
+  #test "Event should only create openings and appointments" do
+  #  #Given
+  #
+  #  #When
+  #  Event.create kind: 'opening'
+  #  Event.create kind: 'appointment'
+  #
+  #  #Then
+  #  assert_raise ArgumentError do
+  #    Event.create kind: 'lunch-break'
+  #  end
+  #end
+
+  test "availabilities should return an array of 7 elements" do
+    #When
+    availabilities = Event.availabilities
+
+    #Then
+    assert_equal 7, availabilities.length
+  end
+
+  test("availabilities should return an array of hashes where keys correspond to week following request") do
+    #When
+    availabilities = Event.availabilities DateTime.parse("2016-05-23")
+
+    #Then
+    assert_equal Date.parse("2016-05-23"), availabilities[0][:date]
+    assert_equal Date.parse("2016-05-24"), availabilities[1][:date]
+    assert_equal Date.parse("2016-05-25"), availabilities[2][:date]
+    assert_equal Date.parse("2016-05-26"), availabilities[3][:date]
+    assert_equal Date.parse("2016-05-27"), availabilities[4][:date]
+    assert_equal Date.parse("2016-05-28"), availabilities[5][:date]
+    assert_equal Date.parse("2016-05-29"), availabilities[6][:date]
+  end
+
+  test("availabilities should return slots of 30 minutes openings") do
+    #Given
+    create_event('opening', "2016-05-23 9:30", "2016-05-23 10:30", false)
+
+    #When
+    availabilities = Event.availabilities DateTime.parse("2016-05-20")
+
+    #Then
+    assert_equal ["9:30","10:00"], availabilities[3][:slots]
+  end
+
   test "Event.availabilities should return an array" do
     #Given
 
