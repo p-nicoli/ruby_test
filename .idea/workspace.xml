@@ -5,18 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d81b62d6-19f8-4199-a7ff-2d27fa97ddac" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.generators" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.rakeTasks" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/doctolib-test.iml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/runConfigurations/Development__doctolib_test.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/runConfigurations/Production__doctolib_test.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/runConfigurations/spec__doctolib_test.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/runConfigurations/test__doctolib_test.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/event.rb" afterPath="$PROJECT_DIR$/app/models/event.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/models/event_test.rb" afterPath="$PROJECT_DIR$/test/models/event_test.rb" />
     </list>
     <ignored path="doctolib-test.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -612,8 +601,16 @@
       <workItem from="1479162126324" duration="75000" />
       <workItem from="1479162246177" duration="11064000" />
       <workItem from="1479196878910" duration="3594000" />
-      <workItem from="1479237267136" duration="13704000" />
+      <workItem from="1479237267136" duration="13724000" />
     </task>
+    <task id="LOCAL-00001" summary="First commit with new method :)">
+      <created>1479253616682</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1479253616682</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -649,7 +646,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="28437000" />
+    <option name="totallyTimeSpent" value="28457000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="25" width="1920" height="1055" extended-state="6" />
@@ -685,6 +682,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="First commit with new method :)" />
+    <option name="LAST_COMMIT_MESSAGE" value="First commit with new method :)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
