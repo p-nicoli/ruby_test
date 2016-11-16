@@ -61,77 +61,43 @@ class EventTest < ActiveSupport::TestCase
     assert_equal ["9:30","10:00"], availabilities[3][:slots]
   end
 
-  test "Event.availabilities should return an array" do
+  test("availabilities should return slots of 30 minutes openings over the next 7 days of request") do
     #Given
+    create_event('opening', "2016-04-01 9:30", "2016-05-23 10:30", false)
+    create_event('opening', "2016-05-23 9:30", "2016-05-23 10:30", false)
+    create_event('opening', "2016-05-25 9:00", "2016-05-25 10:30", false)
+    create_event('opening', "2016-05-28 9:30", "2016-05-28 10:30", false)
 
     #When
-    availabilities = Event.availabilities_legacy DateTime.parse("2016-01-01")
+    availabilities = Event.availabilities DateTime.parse("2016-05-20")
 
     #Then
-    assert_equal [],availabilities
+    assert_equal ["9:30","10:00"], availabilities[3][:slots]
+    assert_equal ["9:00","9:30","10:00"], availabilities[5][:slots]
   end
 
-  test "Event.availabilities should only return openings" do
+  test("availabilities should return weekly recurring openings") do
     #Given
-    create_event('opening', "1970-01-01 08:00", "1970-12-01 09:00", false)
-    create_event(:appointment, "1970-01-01 10:00", "1970-01-01 11:00", false)
+    create_event("opening", "2016-04-01 09:30", "2016-04-01 12:00", true)
 
     #When
-    availabilities = Event.availabilities_legacy
+    availabilities = Event.availabilities DateTime.parse("2016-05-20")
 
     #Then
-    assert_equal 1, availabilities.size
+    (1..6).each { |i| assert_equal [], availabilities[i][:slots] }
+    assert_equal ["9:30","10:00","10:30","11:00","11:30"], availabilities[0][:slots]
   end
 
-  test "Event.availabilities should only return future openings" do
+  test("availabilities should exclude appointments") do
     #Given
-    create_event('opening', "2016-01-01 08:00", "2016-01-01 09:00", false)
-    create_event('opening', "2016-01-02 08:00", "2016-01-02 09:00", false)
-    create_event('opening', "2016-01-03 08:00", "2016-01-03 09:00", false)
+    create_event('opening', "2016-04-01 10:00", "2016-04-01 12:00", false)
+    create_event('appointment', "2016-04-01 10:30", "2016-04-01 11:00", false)
 
     #When
-    availabilities = Event.availabilities_legacy DateTime.parse("2016-01-02")
+    availabilities = Event.availabilities DateTime.parse("2016-04-01")
 
     #Then
-    assert_equal 2, availabilities.size
-  end
-
-  test "Event.availabilities should return array of objects with date attribute and an array of 30 minutes slots" do
-    #Given
-    create_event('opening', "2016-05-23 09:30", "2016-05-23 10:30", false)
-
-    #When
-    availabilities = Event.availabilities_legacy DateTime.parse "2016-05-23"
-
-    #Then
-    assert_equal 1, availabilities.size
-    assert_equal Date.new(2016, 5, 23),availabilities[0][:date]
-    assert_equal ["9:30","10:00"], availabilities[0][:slots]
-
-    #JSON marshalling seems a bit off, should be :
-    # assert_equal '[{"date":"2016/05/23","slots":["09:30","10:00"]}]', availabilities.to_json
-    assert_equal '[{"date":"2016-05-23","slots":["9:30","10:00"]}]', availabilities.to_json
-  end
-
-  test "Event.availabilities should return openings over a 7 day period, including the start_date passed" do
-    #Given
-    create_event('opening', "2016-05-23 09:30", "2016-05-23 10:30", false)
-    create_event('opening', "2016-05-24 09:30", "2016-05-23 10:30", false)
-    create_event('opening', "2016-05-25 09:30", "2016-05-23 10:30", false)
-    create_event('opening', "2016-05-26 09:30", "2016-05-23 10:30", false)
-    create_event('opening', "2016-05-27 09:30", "2016-05-23 10:30", false)
-    create_event('opening', "2016-05-28 09:30", "2016-05-23 10:30", false)
-    create_event('opening', "2016-05-29 09:30", "2016-05-23 10:30", false)
-    create_event('opening', "2016-05-30 09:30", "2016-05-23 10:30", false)
-    create_event('opening', "2016-05-31 09:30", "2016-05-23 10:30", false)
-
-    #When
-    availabilities = Event.availabilities_legacy Date.parse "2016-05-24"
-
-    #Then
-    assert_equal 7, availabilities.length
-    assert_equal Date.parse("2016-05-24"), availabilities[0][:date]
-    assert_equal Date.parse("2016-05-30"), availabilities[6][:date]
+    assert_equal ["10:00","11:00","11:30"], availabilities[0][:slots]
   end
 
   test "one simple test example" do
