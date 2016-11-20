@@ -127,6 +127,20 @@ class EventTest < ActiveSupport::TestCase
     assert_equal ["10:00", "10:30", "11:00", "11:30", "13:30"], availabilities[0][:slots]
   end
 
+  test "availabilities should correcly return an empty array of slots if all openings are taken by appointments" do
+    #Given
+    create_event('opening', "2016-02-28 10:00", "2016-02-28 14:00", true)
+    create_event('appointment', "2016-02-28 10:00", "2016-02-28 14:30", false)
+
+    #When
+    availabilities = Event.availabilities DateTime.parse("2016-02-28")
+
+    #Then
+    assert_equal Date.new(2016, 2, 28), availabilities[0][:date]
+    assert_equal [], availabilities[0][:slots]
+
+  end
+
   test "one simple test example" do
 
     Event.create kind: 'opening', starts_at: DateTime.parse("2014-08-04 09:30"), ends_at: DateTime.parse("2014-08-04 12:30"), weekly_recurring: true
