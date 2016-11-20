@@ -16,7 +16,7 @@ class Event < ActiveRecord::Base
     (request_interval).collect do |day|
       availability = Hash.new
       availability[:date] = day
-      availability[:slots] = make_slots(day, openings)-make_slots(day, appointments)
+      availability[:slots] = (make_slots(day, openings)-make_slots(day, appointments)).uniq
       availability
     end
 
