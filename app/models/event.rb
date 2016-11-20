@@ -1,8 +1,14 @@
 class Event < ActiveRecord::Base
   validates_inclusion_of :kind, :in => %w(opening appointment)
+  validate :times_must_be_on_00_or_30_minutes
 
   public
   RANGE_OF_SEARCH = 6.days
+
+  def times_must_be_on_00_or_30_minutes
+    errors.add(:starts_at, "must be on the dot or on half hour.") unless
+        /(00|30)$/.match(starts_at.to_formatted_s(:time)) and /(00|30)$/.match(ends_at.to_formatted_s(:time))
+  end
 
   def self.availabilities(from_date=DateTime.now)
     request_interval = from_date..from_date+RANGE_OF_SEARCH

@@ -4,7 +4,7 @@ class EventTest < ActiveSupport::TestCase
 
   test 'Event should create stuff' do
     #Given
-    Event.create kind: 'opening'
+    create_event('opening', '2016-05-10 09:00', '2016-05-10 12:00', false)
 
     #When
     found_events = Event.all
@@ -12,6 +12,20 @@ class EventTest < ActiveSupport::TestCase
     #Then
     assert_not_empty found_events
     assert_equal 1, found_events.size
+  end
+
+  test "Event should only create openings and appointments" do
+    #Given
+    create_event('opening', '2016-05-10 09:00', '2016-05-10 12:00', false)
+    create_event('appointment', '2016-05-10 09:00', '2016-05-10 12:00', false)
+    create_event('lunch break', '2016-05-10 09:00', '2016-05-10 12:00', false)
+
+    #When
+    found_events = Event.all
+
+    #Then
+    assert_not_empty found_events
+    assert_equal 2, found_events.size
   end
 
   test 'availabilities should return an array of 7 elements' do
@@ -151,6 +165,17 @@ class EventTest < ActiveSupport::TestCase
     #Then
     assert_equal Date.new(2016, 5, 24), availabilities[0][:date]
     assert_equal %w(9:00 9:30 10:00 10:30 11:00 11:30 12:00 12:30), availabilities[0][:slots]
+  end
+
+  test 'Events should only be created at 00 minutes or 30 minutes' do
+    #Given
+    create_event('opening', '2016-05-23 9:31', '2016-05-23 10:30', false)
+
+    #When
+    found_events = Event.all
+
+    #Then
+    assert_empty found_events
   end
 
   #Leaving this one verbatim
