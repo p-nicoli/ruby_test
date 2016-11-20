@@ -16,7 +16,7 @@ class Event < ActiveRecord::Base
     (request_interval).collect do |day|
       availability = Hash.new
       availability[:date] = day
-      availability[:slots] = (make_slots(day, openings)-make_slots(day, appointments)).uniq
+      availability[:slots] = (make_slots(day, openings)-make_slots(day, appointments)).sort {|x,y| Time.parse(x) <=> Time.parse(y) }
       availability
     end
 
@@ -25,7 +25,7 @@ class Event < ActiveRecord::Base
   def self.make_slots(day, openings)
     openings.select { |opening| opening.starts_at.to_date == day }.collect do |opening|
       get_slots(opening.starts_at, opening.ends_at)
-    end.flatten
+    end.flatten.uniq
   end
 
   def self.recurring_openings(from_date)

@@ -153,6 +153,20 @@ class EventTest < ActiveSupport::TestCase
     assert_equal ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30"], availabilities[0][:slots]
   end
 
+  test "availabilities should correctly merge recurring openings and keep them ordered" do
+    #Given
+    create_event('opening', "2016-05-10 9:00", "2016-05-10 12:00", true)
+    create_event('opening', "2016-05-10 11:30", "2016-05-10 12:30", true)
+    create_event('opening', "2016-05-24 11:30", "2016-05-24 13:00", false)
+
+    #When
+    availabilities = Event.availabilities DateTime.parse("2016-05-24")
+
+    #Then
+    assert_equal Date.new(2016, 5, 24), availabilities[0][:date]
+    assert_equal ["9:00", "9:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30"], availabilities[0][:slots]
+  end
+
   test "one simple test example" do
 
     Event.create kind: 'opening', starts_at: DateTime.parse("2014-08-04 09:30"), ends_at: DateTime.parse("2014-08-04 12:30"), weekly_recurring: true
