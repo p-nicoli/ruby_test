@@ -138,7 +138,19 @@ class EventTest < ActiveSupport::TestCase
     #Then
     assert_equal Date.new(2016, 2, 28), availabilities[0][:date]
     assert_equal [], availabilities[0][:slots]
+  end
 
+  test "availabilities should correctly merge openings" do
+    #Given
+    create_event('opening', "2016-05-10 10:00", "2016-05-10 12:00", false)
+    create_event('opening', "2016-05-10 11:30", "2016-05-10 13:00", false)
+
+    #When
+    availabilities = Event.availabilities DateTime.parse("2016-05-10")
+
+    #Then
+    assert_equal Date.new(2016, 5, 10), availabilities[0][:date]
+    assert_equal ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30"], availabilities[0][:slots]
   end
 
   test "one simple test example" do
