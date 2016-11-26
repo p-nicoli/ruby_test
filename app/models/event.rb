@@ -1,15 +1,8 @@
 class Event < ActiveRecord::Base
   validates_inclusion_of :kind, :in => %w(opening appointment)
-  validate :times_must_be_on_00_or_30_minutes
+  validate :valid_times?, :valid_recurrence?, :overlapping_appointment?
 
   public
-  RANGE_OF_SEARCH = 6.days
-
-  def times_must_be_on_00_or_30_minutes
-    errors.add(:starts_at, "must be on the dot or on half hour.") unless
-        /(00|30)$/.match(starts_at.to_formatted_s(:time)) and /(00|30)$/.match(ends_at.to_formatted_s(:time))
-  end
-
   def self.availabilities(from_date=DateTime.now)
     request_interval = from_date..from_date+RANGE_OF_SEARCH
 
@@ -22,8 +15,27 @@ class Event < ActiveRecord::Base
   end
 
   private
+  RANGE_OF_SEARCH = 6.days
   TIME = '%k:%M'
   OPENING_DURATION = 30.minutes
+
+  def valid_times?
+    errors.add(:starts_at, "must be on the dot or on half hour.") unless /(00|30)$/.match(starts_at.to_formatted_s(:time)) and /(00|30)$/.match(ends_at.to_formatted_s(:time))
+  end
+
+  def valid_recurrence?
+    errors.add(:weekly_recurring, "Only openings can be recurring weekly.") if weekly_recurring == true and kind == "appointment"
+  end
+
+  def overlapping_appointment?
+    appointments_of_the_day = Event.where('kind = ? and DATE(starts_at) = ?', 'appointment', starts_at.to_date)
+
+    errors.add(:starts_at, "Event conflicts with another appointment") unless
+        appointments_of_the_day.select do |event|
+          (ends_at > event.starts_at and ends_at <= event.ends_at) or
+          (starts_at >= event.starts_at and starts_at < event.ends_at)
+        end.empty?
+  end
 
   def self.compose_availability(day, openings, appointments)
     {
@@ -39,11 +51,11 @@ class Event < ActiveRecord::Base
   end
 
   def self.recurring_openings(from_date)
-    recurring_openings = Event.where('kind = ? and weekly_recurring = ?', 'opening', true)
+    recurring_openings = Event.where('kind = ? and weekly_recurring = ? and starts_at <= ?', 'opening', true, from_date)
 
     repeated_openings = []
     (from_date..from_date+RANGE_OF_SEARCH).each do |day|
-      same_day_openings = recurring_openings.select { |opening| opening.starts_at.wday == day.wday}
+      same_day_openings = recurring_openings.select { |opening| opening.starts_at.wday == day.wday }
       same_day_openings.each do |opening|
         new_starts_at = opening.starts_at + (day - opening.starts_at.to_date).days
         new_ends_at = opening.ends_at + (day - opening.ends_at.to_date).days
